@@ -26,7 +26,7 @@ export async function clientGetController(req, res) {
       ON o."clientId" = c.id
       JOIN cakes ca
       ON o."cakeId" = ca.id
-      WHERE o.id = $1`,
+      WHERE c.id = $1`,
       [id]
     )
     if (!orderByIdRequests.rows[0]) {
@@ -34,7 +34,7 @@ export async function clientGetController(req, res) {
       return
     }
 
-    res.send(orderByIdRequests.rows[0]).status(200)
+    res.send(orderByIdRequests.rows).status(200)
   } catch (err) {
     res.send(err).status(400)
   }

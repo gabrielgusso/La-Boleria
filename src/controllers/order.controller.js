@@ -23,7 +23,7 @@ export async function orderGetController(req, res) {
       const orderQueryRequests = await connection.query(
         `SELECT JSON_BUILD_OBJECT('id', c.id, 'name', c.name, 'address' , c.address, 'phone', c.phone) 
         AS client,
-        JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image) 
+        JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image, 'flavour', f.name) 
         AS cake,
         o.id as "orderId", o."createdAt", o.quantity, o."totalPrice" 
         FROM orders o
@@ -31,6 +31,8 @@ export async function orderGetController(req, res) {
         ON o."clientId" = c.id
         JOIN cakes ca
         ON o."cakeId" = ca.id
+        JOIN flavours f
+        ON ca."flavourId" = f.id
         WHERE DATE(o."createdAt") = $1`,
         [date]
       )
@@ -44,14 +46,16 @@ export async function orderGetController(req, res) {
     const orderRequests = await connection.query(
       `SELECT JSON_BUILD_OBJECT('id', c.id, 'name', c.name, 'address' , c.address, 'phone', c.phone) 
       AS client,
-      JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image) 
+      JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image, 'flavour', f.name) 
       AS cake,
       o.id as "orderId", o."createdAt", o.quantity, o."totalPrice" 
       FROM orders o
       JOIN clients c
       ON o."clientId" = c.id
       JOIN cakes ca
-      ON o."cakeId" = ca.id`
+      ON o."cakeId" = ca.id
+      JOIN flavours f
+      ON ca."flavourId" = f.id`
     )
     if (!orderRequests.rows[0]) {
       res.sendStatus(404)
@@ -88,6 +92,34 @@ export async function orderGetByIdController(req, res) {
     }
 
     res.send(orderByIdRequests.rows[0]).status(200)
+  } catch (err) {
+    res.send(err).status(400)
+  }
+}
+
+export async function orderPacthController(req, res) {
+  const id = req.params.id
+  const isNum = /^\d+$/.test(id)
+  if (!isNum) {
+    res.sendStatus(400)
+    return
+  }
+  try {
+    const checkIfExist = await connection.query(
+      "SELECT * FROM orders WHERE id=$1",
+      [id]
+    )
+    if (!checkIfExist.rows[0]) {
+      res.sendStatus(404)
+      return
+    }
+
+    await connection.query(
+      `UPDATE orders SET "isDelivered" = true WHERE id = $1;`,
+      [id]
+    )
+
+    res.sendStatus(204)
   } catch (err) {
     res.send(err).status(400)
   }
