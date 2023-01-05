@@ -28,8 +28,9 @@ CREATE TABLE public.cakes (
     id integer NOT NULL,
     name character varying(50) NOT NULL,
     price numeric NOT NULL,
-    image character varying(100) NOT NULL,
-    description text NOT NULL
+    image character varying(255) NOT NULL,
+    description text NOT NULL,
+    "flavourId" integer NOT NULL
 );
 
 
@@ -59,7 +60,7 @@ ALTER SEQUENCE public.cakes_id_seq OWNED BY public.cakes.id;
 
 CREATE TABLE public.clients (
     id integer NOT NULL,
-    name character varying(50) NOT NULL,
+    name character varying(30) NOT NULL,
     address character varying(100) NOT NULL,
     phone character varying(11) NOT NULL
 );
@@ -86,6 +87,36 @@ ALTER SEQUENCE public.clients_id_seq OWNED BY public.clients.id;
 
 
 --
+-- Name: flavours; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.flavours (
+    id integer NOT NULL,
+    name character varying(20) NOT NULL
+);
+
+
+--
+-- Name: flavours_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.flavours_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: flavours_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.flavours_id_seq OWNED BY public.flavours.id;
+
+
+--
 -- Name: orders; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -95,7 +126,8 @@ CREATE TABLE public.orders (
     "cakeId" integer NOT NULL,
     quantity integer NOT NULL,
     "createdAt" timestamp without time zone DEFAULT now() NOT NULL,
-    "totalPrice" numeric NOT NULL
+    "totalPrice" numeric NOT NULL,
+    "isDelivered" boolean DEFAULT false NOT NULL
 );
 
 
@@ -134,6 +166,13 @@ ALTER TABLE ONLY public.clients ALTER COLUMN id SET DEFAULT nextval('public.clie
 
 
 --
+-- Name: flavours id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.flavours ALTER COLUMN id SET DEFAULT nextval('public.flavours_id_seq'::regclass);
+
+
+--
 -- Name: orders id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -144,35 +183,43 @@ ALTER TABLE ONLY public.orders ALTER COLUMN id SET DEFAULT nextval('public.order
 -- Data for Name: cakes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.cakes VALUES (1, 'Bolo Grande', 40, 'https://encrypted-tbn0.gstatic.com/images?', 'Bolo de chocolate com recheio de leite ninho');
-INSERT INTO public.cakes VALUES (2, 'Bolo Grande', 40, 'https://encrypted-tbn0.gstatic.com/images?', 'Bolo de chocolate com recheio de leite ninho');
-INSERT INTO public.cakes VALUES (3, 'Bolo Grande', 40, 'https://encrypted-tbn0.gstatic.com/images?', 'Bolo de chocolate com recheio de leite ninho');
-INSERT INTO public.cakes VALUES (4, 'Bolo Grande', 40, 'https://encrypted-tbn0.gstatic.com/images?', 'Bolo de chocolate com recheio de leite ninho');
-INSERT INTO public.cakes VALUES (5, 'Bolo Grande', 40, 'https://encrypted-tbn0.gstatic.com/images?', 'Bolo de chocolate com recheio de leite ninho');
-INSERT INTO public.cakes VALUES (6, 'Bolo bolo', 50, 'https://www.receiteria.com.br/wp-content/uploads/bolo-simples-com-cobertura-de-ninho-1.jpg', 'BOloooooooooooooooooo');
+INSERT INTO public.cakes VALUES (1, 'Bolo Grande', 50, 'https://www.receiteria.com.br/wp-content/uploads/bolo-simples-com-cobertura-de-ninho-1.jpg', 'BOloooooooooooooooooo', 1);
+INSERT INTO public.cakes VALUES (2, 'Bolo BOlo', 50, 'https://www.receiteria.com.br/wp-content/uploads/bolo-simples-com-cobertura-de-ninho-1.jpg', 'BOloooooooooooooooooo', 1);
+INSERT INTO public.cakes VALUES (3, 'Bolo jh', 50, 'https://www.receiteria.com.br/wp-content/uploads/bolo-simples-com-cobertura-de-ninho-1.jpg', 'BOloooooooooooooooooo', 2);
 
 
 --
 -- Data for Name: clients; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.clients VALUES (1, 'Gabriel', 'Rua taltaltlatlalt', '49984056021');
+INSERT INTO public.clients VALUES (1, 'test', 'Rua taltaltlatlalt', '4998405602');
 INSERT INTO public.clients VALUES (2, 'test', 'Rua taltaltlatlalt', '4998405602');
-INSERT INTO public.clients VALUES (3, 'test', 'Rua taltaltlatlalt', '4998405602');
+INSERT INTO public.clients VALUES (3, 'GABRIEL', 'Rua taltaltlatlalt', '4998405602');
+
+
+--
+-- Data for Name: flavours; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+INSERT INTO public.flavours VALUES (1, 'Chocolate');
+INSERT INTO public.flavours VALUES (2, 'Morango');
 
 
 --
 -- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.orders VALUES (1, 1, 1, 2, '2023-01-04 22:12:52.228966', 26);
+INSERT INTO public.orders VALUES (10, 2, 3, 5, '2023-01-05 11:15:56.455075', 90, false);
+INSERT INTO public.orders VALUES (11, 2, 1, 1, '2023-01-05 11:20:34.547774', 20, false);
+INSERT INTO public.orders VALUES (8, 3, 1, 2, '2023-01-05 11:11:43.197229', 30, true);
+INSERT INTO public.orders VALUES (9, 1, 2, 5, '2023-01-05 11:12:32.210614', 90, true);
 
 
 --
 -- Name: cakes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.cakes_id_seq', 6, true);
+SELECT pg_catalog.setval('public.cakes_id_seq', 3, true);
 
 
 --
@@ -183,10 +230,17 @@ SELECT pg_catalog.setval('public.clients_id_seq', 3, true);
 
 
 --
+-- Name: flavours_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.flavours_id_seq', 2, true);
+
+
+--
 -- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.orders_id_seq', 1, true);
+SELECT pg_catalog.setval('public.orders_id_seq', 11, true);
 
 
 --
@@ -206,11 +260,27 @@ ALTER TABLE ONLY public.clients
 
 
 --
+-- Name: flavours flavours_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.flavours
+    ADD CONSTRAINT flavours_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.orders
     ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cakes cakes_fk0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cakes
+    ADD CONSTRAINT cakes_fk0 FOREIGN KEY ("flavourId") REFERENCES public.flavours(id);
 
 
 --
