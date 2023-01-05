@@ -5,4 +5,4 @@ export const orderRoute = Router()
 
 orderRoute.post("/order", orderMiddleware, orderPostController)
 
-orderRoute.get("/order", orderGetController)
+orderRoute.get("/orders", orderGetController)
