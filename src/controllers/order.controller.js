@@ -25,7 +25,7 @@ export async function orderGetController(req, res) {
         AS client,
         JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image, 'flavour', f.name) 
         AS cake,
-        o.id as "orderId", o."createdAt", o.quantity, o."totalPrice" 
+        o.id as "orderId", TO_CHAR(o."createdAt", 'yyyy-mm-dd HH24:MI') as "createdAt", o.quantity, o."totalPrice", o."isDelivered" 
         FROM orders o
         JOIN clients c
         ON o."clientId" = c.id
@@ -48,7 +48,7 @@ export async function orderGetController(req, res) {
       AS client,
       JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image, 'flavour', f.name) 
       AS cake,
-      o.id as "orderId", o."createdAt", o.quantity, o."totalPrice" 
+      o.id as "orderId", TO_CHAR(o."createdAt", 'yyyy-mm-dd HH24:MI') as "createdAt", o.quantity, o."totalPrice", o."isDelivered" 
       FROM orders o
       JOIN clients c
       ON o."clientId" = c.id
@@ -77,7 +77,7 @@ export async function orderGetByIdController(req, res) {
         AS client,
         JSON_BUILD_OBJECT('id', ca.id, 'name', ca.name, 'price' , ca.price, 'description', ca.description, 'image', ca.image) 
         AS cake,
-        o.id as "orderId", TO_CHAR(o."createdAt", 'yyyy-mm-dd HH24:MI') as "createdAt", o.quantity, o."totalPrice" 
+        o.id as "orderId", TO_CHAR(o."createdAt", 'yyyy-mm-dd HH24:MI') as "createdAt", o.quantity, o."totalPrice", o."isDelivered"  
         FROM orders o
         JOIN clients c
         ON o."clientId" = c.id
